@@ -1,6 +1,7 @@
 package com.adel.coursecatalogservice.controller
 
 import com.adel.coursecatalogservice.service.GreetingService
+import mu.KLogging
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -11,6 +12,10 @@ import org.springframework.web.bind.annotation.RestController
 class GreetingController(
     val greetingService: GreetingService
 ) {
+    companion object: KLogging()
     @GetMapping("/{name}")
-    fun retrieveGreeting(@PathVariable("name") name: String) = greetingService.retrieveGreeting(name)
+    fun retrieveGreeting(@PathVariable("name") name: String): String {
+        logger().info("Name is $name")
+        return greetingService.retrieveGreeting(name)
+    }
 }
