@@ -48,6 +48,44 @@ class CourseControllerUnitTest {
     }
 
     @Test
+    fun addCourseValidation() {
+        val courseDTO = CourseDTO(null, "", "")
+
+        every {
+            courseServiceMock.addCourse(any())
+        } returns courseDTO(id = 1)
+
+        val response = webTestClient
+            .post()
+            .uri("/v1/courses")
+            .bodyValue(courseDTO)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody(String::class.java)
+            .returnResult()
+            .responseBody
+
+        assertEquals("Course Category must not be blank, Course Name must not be blank", response)
+    }
+
+    @Test
+    fun addCourseRuntimeException() {
+        val courseDTO = CourseDTO(null, "Build Restful APIs using Kotlin and SpringBoot", "Development")
+        val errorMessage = "Unexpected error happens"
+
+        every {
+            courseServiceMock.addCourse(any())
+        } throws RuntimeException(errorMessage)
+
+        webTestClient
+            .post()
+            .uri("/v1/courses")
+            .bodyValue(courseDTO)
+            .exchange()
+            .expectStatus().is5xxServerError
+    }
+
+    @Test
     fun retrieveAllCourses() {
         every {
             courseServiceMock.retrieveAllCourses()
