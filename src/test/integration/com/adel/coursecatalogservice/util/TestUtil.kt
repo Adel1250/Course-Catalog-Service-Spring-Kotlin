@@ -1,5 +1,6 @@
 package com.adel.coursecatalogservice.util
 
+import com.adel.coursecatalogservice.dto.CourseDTO
 import com.adel.coursecatalogservice.entity.CourseEntity
 
 fun courseEntityList() = listOf(
@@ -12,4 +13,14 @@ fun courseEntityList() = listOf(
     CourseEntity(null,
         "Wiremock for Java Developers", "Development" ,
     )
+)
+
+fun courseDTO(
+    id: Int? = null,
+    name: String = "Build RestFul APis using Spring Boot and Kotlin",
+    category: String = "Dilip Sundarraj",
+) = CourseDTO(
+    id,
+    name,
+    category
 )
