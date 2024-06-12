@@ -30,6 +30,9 @@ dependencies {
 //	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+	testImplementation("org.springframework.boot:spring-boot-starter-webflux")
+	testImplementation("io.mockk:mockk:1.10.4")
+	testImplementation("com.ninja-squad:springmockk:3.0.1")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -41,4 +44,17 @@ kotlin {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+sourceSets {
+	test {
+		// before 7.1
+//		withConvention(KotlinSourceSet::class) {
+//			kotlin.setSrcDirs(listOf("src/test/integration", "src/test/unit"))
+//		}
+
+		java {
+			setSrcDirs(listOf("src/test/integration", "src/test/unit"))
+		}
+	}
 }
