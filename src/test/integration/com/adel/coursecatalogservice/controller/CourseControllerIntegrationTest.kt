@@ -3,7 +3,9 @@ package com.adel.coursecatalogservice.controller
 import com.adel.coursecatalogservice.dto.CourseDTO
 import com.adel.coursecatalogservice.entity.CourseEntity
 import com.adel.coursecatalogservice.repository.CourseRepository
+import com.adel.coursecatalogservice.repository.InstructorRepository
 import com.adel.coursecatalogservice.util.courseEntityList
+import com.adel.coursecatalogservice.util.instructorEntity
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,16 +27,23 @@ class CourseControllerIntegrationTest {
     @Autowired
     lateinit var courseRepository: CourseRepository
 
+    @Autowired
+    lateinit var instructorRepository: InstructorRepository
+
     @BeforeEach
     fun setUp() {
         courseRepository.deleteAll()
-        val courses = courseEntityList()
+        instructorRepository.deleteAll()
+        val instructor = instructorEntity()
+        instructorRepository.save(instructor)
+        val courses = courseEntityList(instructor)
         courseRepository.saveAll(courses)
     }
 
     @Test
     fun addCourse() {
-        val courseDTO = CourseDTO(null, "Build Restful APIs using Kotlin and SpringBoot", "Development")
+        val instructor = instructorRepository.findAll().first()
+        val courseDTO = CourseDTO(null, "Build Restful APIs using Kotlin and SpringBoot", "Development", instructor.id)
         val savedCourseDTO = webTestClient
             .post()
             .uri("/v1/courses")
@@ -84,10 +93,11 @@ class CourseControllerIntegrationTest {
 
     @Test
     fun updateCourse() {
-        val course = CourseEntity(null, "Build RestFul APis using SpringBoot and Kotlin", "Development")
+        val instructor = instructorRepository.findAll().first()
+        val course = CourseEntity(null, "Build RestFul APis using SpringBoot and Kotlin", "Development", instructor)
         courseRepository.save(course)
 
-        val courseDTO = CourseDTO(null, "Kotlin", "Development")
+        val courseDTO = CourseDTO(null, "Kotlin", "Development", instructor.id)
         courseRepository.save(course)
 
         val updatedCourseDTO = webTestClient
@@ -105,9 +115,10 @@ class CourseControllerIntegrationTest {
 
     @Test
     fun deleteCourse() {
+        val course = courseRepository.findAll().first()
         webTestClient
             .delete()
-            .uri("/v1/courses/1")
+            .uri("/v1/courses/${course.id}")
             .exchange()
             .expectStatus().is2xxSuccessful
 

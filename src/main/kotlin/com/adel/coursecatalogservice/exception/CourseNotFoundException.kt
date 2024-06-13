@@ -1,3 +1,3 @@
 package com.adel.coursecatalogservice.exception
 
-class CourseNotFoundException(message: String) : RuntimeException()
+class CourseNotFoundException(message: String) : RuntimeException(message)

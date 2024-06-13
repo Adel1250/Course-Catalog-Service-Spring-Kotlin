@@ -3,19 +3,27 @@ package com.adel.coursecatalogservice.service
 import com.adel.coursecatalogservice.dto.CourseDTO
 import com.adel.coursecatalogservice.entity.CourseEntity
 import com.adel.coursecatalogservice.exception.CourseNotFoundException
+import com.adel.coursecatalogservice.exception.InstructorNotValidException
 import com.adel.coursecatalogservice.repository.CourseRepository
 import mu.KLogging
 import org.springframework.stereotype.Service
 
 @Service
-class CourseService(val courseRepository: CourseRepository) {
+class CourseService(
+    val courseRepository: CourseRepository,
+    val instructorService: InstructorService
+) {
     companion object : KLogging()
 
     fun addCourse(courseDTO: CourseDTO): CourseDTO {
+        val optionalInstructor = instructorService.retrieveInstructorById(courseDTO.instructorId!!)
+        if (optionalInstructor.isEmpty) {
+            throw InstructorNotValidException("Instructor with ID ${courseDTO.instructorId} is not valid!")
+        }
         return courseRepository.save(courseDTO.let {
-            CourseEntity(null, it.name, it.category)
+            CourseEntity(null, it.name, it.category, optionalInstructor.get())
         }).let {
-            CourseDTO(it.id, it.name, it.category)
+            CourseDTO(it.id, it.name, it.category, optionalInstructor.get().id)
         }.also {
             logger().info { "Saved course is $it" }
         }
